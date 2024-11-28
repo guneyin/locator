@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/guneyin/locator/config"
+	"github.com/guneyin/locator/controller"
 	"github.com/guneyin/locator/mw"
 	"github.com/guneyin/locator/util"
 	"github.com/spf13/cobra"
@@ -27,7 +28,7 @@ type Application struct {
 	Version    string
 	Config     *config.Config
 	HttpServer *fiber.App
-	Router     *fiber.Router
+	Controller *controller.Controller
 }
 
 func NewApplication(name string) (*Application, error) {
@@ -61,13 +62,14 @@ func NewApplication(name string) (*Application, error) {
 	}))
 
 	api := httpServer.Group("/api")
+	cnt := controller.New(logger, api)
 
 	return &Application{
 		Name:       name,
 		Version:    util.GetVersion().Version,
 		Config:     cfg,
 		HttpServer: httpServer,
-		Router:     &api,
+		Controller: cnt,
 	}, nil
 }
 

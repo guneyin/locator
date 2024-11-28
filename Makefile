@@ -23,7 +23,7 @@ doc:
 	swag init -d cmd/app/
 
 run:
-	go run . run
+	go run cmd/app/main.go run
 
 build:
 	go build -o ${BINARY_NAME} -ldflags "-X ${LDFLAG_VERSION} -X ${LDFLAG_COMMIT_HASH} -X ${LDFLAG_BUILD_TIMESTAMP}" cmd/app/main.go
