@@ -9,7 +9,8 @@ const (
 )
 
 type Config struct {
-	Port int `env:"PORT"`
+	Port   int    `env:"PORT"`
+	DBConn string `env:"DB_CONN"`
 }
 
 func NewConfig() (*Config, error) {

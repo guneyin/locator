@@ -5,7 +5,7 @@ import (
 	"github.com/guneyin/locator/dto"
 	"github.com/guneyin/locator/mw"
 	"github.com/guneyin/locator/service/general"
-	"log/slog"
+	"gorm.io/gorm"
 )
 
 const generalControllerName = "general"
@@ -14,7 +14,7 @@ type General struct {
 	svc *general.Service
 }
 
-func NewGeneral(_ *slog.Logger) IController {
+func NewGeneral(_ *gorm.DB) IController {
 	svc := general.New()
 
 	return &General{svc}

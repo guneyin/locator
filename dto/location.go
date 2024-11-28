@@ -3,6 +3,7 @@ package dto
 import (
 	"encoding/json"
 	"errors"
+	"github.com/guneyin/locator/repository/location"
 )
 
 var (
@@ -18,11 +19,13 @@ type LocationDto struct {
 }
 
 type LocationResponseDto struct {
-	Id string `json:"id"`
+	Id uint `json:"id"`
 	LocationDto
 }
 
-type LocationListResponseDto []LocationResponseDto
+type LocationListResponseDto struct {
+	Items []LocationResponseDto
+}
 
 func NewLocationDto(data []byte) (*LocationDto, error) {
 	loc := &LocationDto{}
@@ -33,6 +36,38 @@ func NewLocationDto(data []byte) (*LocationDto, error) {
 	}
 
 	return loc.validate()
+}
+
+func NewLocationResponseDto(entity *location.Location) (*LocationResponseDto, error) {
+	loc := &LocationResponseDto{
+		Id: entity.ID,
+		LocationDto: LocationDto{
+			Latitude:    entity.Latitude,
+			Longitude:   entity.Longitude,
+			Name:        entity.Name,
+			MarkerColor: entity.MarkerColor,
+		},
+	}
+
+	return loc, nil
+}
+
+func NewLocationListResponseDto(entity location.LocationList) (*LocationListResponseDto, error) {
+	locList := make([]LocationResponseDto, len(entity))
+
+	for i, item := range entity {
+		locList[i] = LocationResponseDto{
+			Id: item.ID,
+			LocationDto: LocationDto{
+				Latitude:    item.Latitude,
+				Longitude:   item.Longitude,
+				Name:        item.Name,
+				MarkerColor: item.MarkerColor,
+			},
+		}
+	}
+
+	return &LocationListResponseDto{Items: locList}, nil
 }
 
 func (l *LocationDto) validate() (*LocationDto, error) {
@@ -46,4 +81,13 @@ func (l *LocationDto) validate() (*LocationDto, error) {
 	}
 
 	return l, errs
+}
+
+func (l *LocationDto) ToEntity() *location.Location {
+	return &location.Location{
+		Latitude:    l.Latitude,
+		Longitude:   l.Longitude,
+		Name:        l.Name,
+		MarkerColor: l.MarkerColor,
+	}
 }

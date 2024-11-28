@@ -9,9 +9,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/guneyin/locator/config"
 	"github.com/guneyin/locator/controller"
+	"github.com/guneyin/locator/db"
 	"github.com/guneyin/locator/mw"
 	"github.com/guneyin/locator/util"
 	"github.com/spf13/cobra"
+	"gorm.io/gorm"
 	"log"
 	"log/slog"
 	"os"
@@ -29,10 +31,16 @@ type Application struct {
 	Config     *config.Config
 	HttpServer *fiber.App
 	Controller *controller.Controller
+	DB         *gorm.DB
 }
 
 func NewApplication(name string) (*Application, error) {
 	cfg, err := config.NewConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := database.NewDB(cfg.DBConn)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +70,7 @@ func NewApplication(name string) (*Application, error) {
 	}))
 
 	api := httpServer.Group("/api")
-	cnt := controller.New(logger, api)
+	cnt := controller.New(db, api)
 
 	return &Application{
 		Name:       name,
@@ -70,6 +78,7 @@ func NewApplication(name string) (*Application, error) {
 		Config:     cfg,
 		HttpServer: httpServer,
 		Controller: cnt,
+		DB:         db,
 	}, nil
 }
 

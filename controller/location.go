@@ -5,7 +5,7 @@ import (
 	"github.com/guneyin/locator/dto"
 	"github.com/guneyin/locator/mw"
 	"github.com/guneyin/locator/service/location"
-	"log/slog"
+	"gorm.io/gorm"
 )
 
 const locationControllerName = "location"
@@ -14,8 +14,8 @@ type Location struct {
 	svc *location.Service
 }
 
-func NewLocation(_ *slog.Logger) IController {
-	svc := location.New()
+func NewLocation(db *gorm.DB) IController {
+	svc := location.New(db)
 
 	return &Location{svc}
 }
@@ -89,8 +89,12 @@ func (l Location) List(c *fiber.Ctx) error {
 // @Failure 500 {object} mw.ResponseHTTP{}
 // @Router /location/{id} [get]
 func (l Location) Detail(c *fiber.Ctx) error {
-	id := c.Params("id")
-	loc, err := l.svc.Detail(c.Context(), id)
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return mw.ErrInvalidId
+	}
+
+	loc, err := l.svc.Detail(c.Context(), uint(id))
 	if err != nil {
 		return err
 	}
@@ -111,13 +115,17 @@ func (l Location) Detail(c *fiber.Ctx) error {
 // @Failure 500 {object} mw.ResponseHTTP{}
 // @Router /location/{id} [patch]
 func (l Location) Edit(c *fiber.Ctx) error {
-	id := c.Params("id")
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return mw.ErrInvalidId
+	}
+
 	body, err := dto.NewLocationDto(c.Body())
 	if err != nil {
 		return err
 	}
 
-	loc, err := l.svc.Edit(c.Context(), id, body)
+	loc, err := l.svc.Edit(c.Context(), uint(id), body)
 	if err != nil {
 		return err
 	}
