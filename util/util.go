@@ -1,6 +1,7 @@
 package util
 
 import (
+	"strconv"
 	"time"
 )
 
@@ -32,4 +33,12 @@ func SetLastRun(t time.Time) {
 
 func GetLastRun() time.Time {
 	return lastRun
+}
+
+func FloatToStr(f float64) string {
+	return strconv.FormatFloat(f, 'f', -1, 64)
+}
+
+func StrToFloat(s string) (float64, error) {
+	return strconv.ParseFloat(s, 64)
 }

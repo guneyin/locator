@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/guneyin/locator/repository/location"
+	"github.com/guneyin/locator/util"
 )
 
 var (
@@ -12,10 +13,10 @@ var (
 )
 
 type LocationDto struct {
-	Latitude    float64 `json:"latitude"`
-	Longitude   float64 `json:"longitude"`
-	Name        string  `json:"name"`
-	MarkerColor string  `json:"markerColor"`
+	Latitude    string `json:"latitude"`
+	Longitude   string `json:"longitude"`
+	Name        string `json:"name"`
+	MarkerColor string `json:"markerColor"`
 }
 
 type LocationResponseDto struct {
@@ -42,8 +43,8 @@ func NewLocationResponseDto(entity *location.Location) (*LocationResponseDto, er
 	loc := &LocationResponseDto{
 		Id: entity.ID,
 		LocationDto: LocationDto{
-			Latitude:    entity.Latitude,
-			Longitude:   entity.Longitude,
+			Latitude:    util.FloatToStr(entity.Latitude),
+			Longitude:   util.FloatToStr(entity.Longitude),
 			Name:        entity.Name,
 			MarkerColor: entity.MarkerColor,
 		},
@@ -59,8 +60,8 @@ func NewLocationListResponseDto(entity location.LocationList) (*LocationListResp
 		locList[i] = LocationResponseDto{
 			Id: item.ID,
 			LocationDto: LocationDto{
-				Latitude:    item.Latitude,
-				Longitude:   item.Longitude,
+				Latitude:    util.FloatToStr(item.Latitude),
+				Longitude:   util.FloatToStr(item.Longitude),
 				Name:        item.Name,
 				MarkerColor: item.MarkerColor,
 			},
@@ -73,7 +74,7 @@ func NewLocationListResponseDto(entity location.LocationList) (*LocationListResp
 func (l *LocationDto) validate() (*LocationDto, error) {
 	var errs error
 
-	if l.Latitude <= 0 || l.Longitude <= 0 {
+	if l.Latitude == "0" || l.Longitude == "0" {
 		errs = errors.Join(errs, ErrInvalidLocation)
 	}
 	if l.MarkerColor == "" {
@@ -84,9 +85,12 @@ func (l *LocationDto) validate() (*LocationDto, error) {
 }
 
 func (l *LocationDto) ToEntity() *location.Location {
+	lat, _ := util.StrToFloat(l.Latitude)
+	lon, _ := util.StrToFloat(l.Longitude)
+
 	return &location.Location{
-		Latitude:    l.Latitude,
-		Longitude:   l.Longitude,
+		Latitude:    lat,
+		Longitude:   lon,
 		Name:        l.Name,
 		MarkerColor: l.MarkerColor,
 	}

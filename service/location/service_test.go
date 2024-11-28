@@ -2,13 +2,19 @@ package location
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/AvraamMavridis/randomcolor"
 	database "github.com/guneyin/locator/db"
 	"github.com/guneyin/locator/dto"
 	. "github.com/smartystreets/goconvey/convey"
+	"os"
 	"testing"
 )
 
-var svc *Service
+var (
+	svc *Service
+	td  *testData
+)
 
 func init() {
 	db, err := database.NewTestDB()
@@ -17,57 +23,85 @@ func init() {
 	}
 
 	svc = New(db)
+	td = newLocationTestData()
+}
+
+type testData struct {
+	DataView struct {
+		DataTable struct {
+			TotalRows    int `json:"totalRows"`
+			RowsReturned int `json:"rowsReturned"`
+			Rows         []struct {
+				Text []string `json:"text"`
+			} `json:"rows"`
+		} `json:"dataTable"`
+	} `json:"dataView"`
+}
+
+func newLocationTestData() *testData {
+	file, err := os.ReadFile("../../testdata/locations.json")
+	if err != nil {
+		panic(err)
+	}
+
+	data := new(testData)
+	err = json.Unmarshal(file, &data)
+	if err != nil {
+		panic(err)
+	}
+
+	return data
 }
 
 func TestLocationService(t *testing.T) {
 	ctx := context.Background()
 
-	locAdd := &dto.LocationDto{
-		Latitude:    41.00641613914117,
-		Longitude:   28.975732826139218,
-		Name:        "Sultanahmet Meydanı",
-		MarkerColor: "#3cb371",
-	}
-
-	var locId uint
 	Convey("Add", t, func() {
-		added, err := svc.Add(ctx, locAdd)
-		So(err, ShouldBeNil)
-		So(added, ShouldNotBeNil)
+		for _, row := range td.DataView.DataTable.Rows {
+			loc := &dto.LocationDto{
+				Latitude:    row.Text[8],
+				Longitude:   row.Text[9],
+				Name:        row.Text[1],
+				MarkerColor: randomcolor.GetRandomColorInHex(),
+			}
 
-		locId = added.Id
+			added, err := svc.Add(ctx, loc)
+			So(err, ShouldBeNil)
+			So(added, ShouldNotBeNil)
+		}
 	})
 
 	Convey("List", t, func() {
-		for range 10 {
-			_, _ = svc.Add(ctx, locAdd)
-		}
-
 		locList, err := svc.List(ctx)
 		So(err, ShouldBeNil)
 		So(locList, ShouldNotBeNil)
 		size := len(locList.Items)
-		So(size, ShouldEqual, 11)
+		So(size, ShouldEqual, td.DataView.DataTable.TotalRows)
 	})
 
 	Convey("Detail", t, func() {
-		loc, err := svc.Detail(ctx, locId)
+		loc, err := svc.Detail(ctx, 10)
 		So(err, ShouldBeNil)
 		So(loc, ShouldNotBeNil)
-		So(loc.Name, ShouldEqual, locAdd.Name)
+		So(loc.Name, ShouldEqual, loc.Name)
 	})
 
 	Convey("Edit", t, func() {
-		loc := new(dto.LocationDto)
-		loc.Name = "Sultanahmet Square"
+		locBesiktas, err := svc.Detail(ctx, 10)
+		So(err, ShouldBeNil)
+		So(locBesiktas, ShouldNotBeNil)
+		So(locBesiktas.Name, ShouldEqual, "Beşiktaş")
 
-		edited, err := svc.Edit(ctx, locId, loc)
+		locEdited := new(dto.LocationDto)
+		locEdited.Name = "Besiktas"
+
+		edited, err := svc.Edit(ctx, 10, locEdited)
 		So(err, ShouldBeNil)
 		So(edited, ShouldNotBeNil)
-		So(edited.Id, ShouldEqual, locId)
-		So(edited.Name, ShouldEqual, loc.Name)
-		So(edited.Latitude, ShouldEqual, locAdd.Latitude)
-		So(edited.Longitude, ShouldEqual, locAdd.Longitude)
-		So(edited.MarkerColor, ShouldEqual, locAdd.MarkerColor)
+		So(edited.Id, ShouldEqual, 10)
+		So(edited.Name, ShouldEqual, locEdited.Name)
+		So(edited.Latitude, ShouldEqual, locBesiktas.Latitude)
+		So(edited.Longitude, ShouldEqual, locBesiktas.Longitude)
+		So(edited.MarkerColor, ShouldEqual, locBesiktas.MarkerColor)
 	})
 }
