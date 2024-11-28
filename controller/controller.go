@@ -17,21 +17,22 @@ type Controller struct {
 }
 
 func New(log *slog.Logger, router fiber.Router) *Controller {
-	handler := &Controller{
+	c := &Controller{
 		log:         log,
 		router:      router,
 		controllers: make(map[string]IController),
 	}
-	handler.registerHandlers()
+	c.registerControllers()
 
-	return handler
+	return c
 }
 
-func (c Controller) registerHandlers() {
-	c.registerHandler(NewGeneral)
+func (c Controller) registerControllers() {
+	c.register(NewGeneral)
+	c.register(NewLocation)
 }
 
-func (c Controller) registerHandler(f func(log *slog.Logger) IController) {
+func (c Controller) register(f func(log *slog.Logger) IController) {
 	hnd := f(c.log).SetRoutes(c.router)
 	c.controllers[hnd.Name()] = hnd
 }

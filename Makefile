@@ -20,7 +20,7 @@ vet:
 	go vet ./...
 
 doc:
-	swag init -d cmd/app/
+	swag init -g cmd/app/main.go
 
 run:
 	go run cmd/app/main.go run
