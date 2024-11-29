@@ -3,8 +3,8 @@ services:
     build: .
     restart: on-failure:5
     ports:
-      - "8080:8080"
-      - "5432:5432"
+      - "8081:8081"
+      - "8082:8082"
     environment:
       - PORT=${PORT}
       - DB_CONN=${DB_CONN}
