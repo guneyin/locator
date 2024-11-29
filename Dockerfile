@@ -6,7 +6,6 @@ COPY go.* ./
 RUN go mod download
 
 COPY . ./
-RUN rm .env
 
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init -g cmd/app/main.go
