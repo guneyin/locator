@@ -41,7 +41,7 @@ func NewApplication(name string) (*Application, error) {
 		return nil, err
 	}
 
-	db, err := database.NewDB(cfg.DBConn)
+	db, err := database.NewDB(cfg)
 	if err != nil {
 		return nil, err
 	}

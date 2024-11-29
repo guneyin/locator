@@ -10,8 +10,12 @@ const (
 )
 
 type Config struct {
+	DbHost       string `env:"DB_HOST"`
+	DbPort       int    `env:"DB_PORT"`
+	DbUser       string `env:"DB_USER"`
+	DbPassword   string `env:"DB_PASSWORD"`
+	DbName       string `env:"DB_NAME"`
 	Port         int    `env:"PORT"`
-	DBConn       string `env:"DB_CONN"`
 	MaxRateLimit int    `env:"MAX_RATE_LIMIT"`
 }
 
