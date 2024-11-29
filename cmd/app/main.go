@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/guneyin/locator/config"
 	"github.com/guneyin/locator/controller"
@@ -35,7 +36,7 @@ type Application struct {
 }
 
 func NewApplication(name string) (*Application, error) {
-	cfg, err := config.NewConfig()
+	cfg, err := config.New()
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +69,10 @@ func NewApplication(name string) (*Application, error) {
 		Path:     "docs",
 		Title:    "Swagger API Docs",
 	}))
+
+	if cfg.MaxRateLimit > 0 {
+		httpServer.Use(limiter.New(limiter.Config{Max: cfg.MaxRateLimit, Expiration: time.Minute}))
+	}
 
 	api := httpServer.Group("/api")
 	cnt := controller.New(db, api)

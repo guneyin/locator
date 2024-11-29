@@ -28,7 +28,7 @@ type LocationListResponseDto struct {
 	Items []LocationResponseDto
 }
 
-func NewLocationDto(data []byte) (*LocationDto, error) {
+func NewLocationDto(data []byte, validate bool) (*LocationDto, error) {
 	loc := &LocationDto{}
 
 	err := json.Unmarshal(data, loc)
@@ -36,7 +36,10 @@ func NewLocationDto(data []byte) (*LocationDto, error) {
 		return nil, err
 	}
 
-	return loc.validate()
+	if validate {
+		return loc.validate()
+	}
+	return loc, nil
 }
 
 func NewLocationResponseDto(entity *location.Location) (*LocationResponseDto, error) {

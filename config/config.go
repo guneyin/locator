@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"log/slog"
 )
 
 const (
@@ -9,16 +10,18 @@ const (
 )
 
 type Config struct {
-	Port   int    `env:"PORT"`
-	DBConn string `env:"DB_CONN"`
+	Port         int    `env:"PORT"`
+	DBConn       string `env:"DB_CONN"`
+	MaxRateLimit int    `env:"MAX_RATE_LIMIT"`
 }
 
-func NewConfig() (*Config, error) {
+func New() (*Config, error) {
 	var cfg Config
 
 	err := cleanenv.ReadConfig(".env", &cfg)
 	if err != nil {
-		return nil, err
+		_ = cleanenv.ReadEnv(&cfg)
+		slog.Info(err.Error())
 	}
 
 	err = cfg.validate()

@@ -46,7 +46,7 @@ func (l Location) SetRoutes(r fiber.Router) IController {
 // @Failure 500 {object} mw.ResponseHTTP{}
 // @Router /location [post]
 func (l Location) Add(c *fiber.Ctx) error {
-	loc, err := dto.NewLocationDto(c.Body())
+	loc, err := dto.NewLocationDto(c.Body(), true)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (l Location) Edit(c *fiber.Ctx) error {
 		return mw.ErrInvalidId
 	}
 
-	body, err := dto.NewLocationDto(c.Body())
+	body, err := dto.NewLocationDto(c.Body(), false)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (l Location) Edit(c *fiber.Ctx) error {
 // @Failure 500 {object} mw.ResponseHTTP{}
 // @Router /location/route [post]
 func (l Location) Route(c *fiber.Ctx) error {
-	loc, err := dto.NewLocationDto(c.Body())
+	loc, err := dto.NewLocationDto(c.Body(), true)
 	if err != nil {
 		return err
 	}
