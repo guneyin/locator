@@ -88,12 +88,9 @@ func (l *LocationDto) validate() (*LocationDto, error) {
 }
 
 func (l *LocationDto) ToEntity() *location.Location {
-	lat, _ := util.StrToFloat(l.Latitude)
-	lon, _ := util.StrToFloat(l.Longitude)
-
 	return &location.Location{
-		Latitude:    lat,
-		Longitude:   lon,
+		Latitude:    util.StrToFloat(l.Latitude),
+		Longitude:   util.StrToFloat(l.Longitude),
 		Name:        l.Name,
 		MarkerColor: l.MarkerColor,
 	}

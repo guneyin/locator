@@ -52,10 +52,13 @@ func (s *Service) Edit(ctx context.Context, id uint, loc *dto.LocationDto) (*dto
 }
 
 func (s *Service) Route(ctx context.Context, loc *dto.LocationDto) (*dto.LocationListResponseDto, error) {
-	locList, err := s.repo.List(ctx)
+	source, err := s.repo.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return dto.NewLocationListResponseDto(locList)
+	route := NewRoute(source)
+	route.Do(loc)
+
+	return route.ToLocationListResponseDto(), nil
 }

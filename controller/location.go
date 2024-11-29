@@ -139,6 +139,7 @@ func (l Location) Edit(c *fiber.Ctx) error {
 // @Tags location route
 // @Accept json
 // @Produce json
+// @Param location body dto.LocationDto true "Edit location"
 // @Success 200 {object} mw.ResponseHTTP{data=dto.LocationListResponseDto}
 // @Failure 500 {object} mw.ResponseHTTP{}
 // @Router /location/route [post]
