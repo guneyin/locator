@@ -8,7 +8,7 @@ env:
   IMAGE_NAME: "guneyin/locator-app"
 
 jobs:
-  deploy-on-coolify:
+  deploy-to-coolify:
     runs-on: ubuntu-latest
     permissions:
       contents: read
