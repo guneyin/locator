@@ -1,0 +1,11 @@
+services:
+  server:
+    build: .
+    restart: on-failure:5
+    ports:
+      - "8080:8080"
+      - "5432:5432"
+    environment:
+      - PORT=${PORT}
+      - DB_CONN=${DB_CONN}
+      - MAX_RATE_LIMIT=${MAX_RATE_LIMIT}
