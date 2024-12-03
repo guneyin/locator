@@ -117,7 +117,6 @@ func runApp() {
 // @contact.url https://github.com/guneyin
 // @contact.email guneyin@gmail.com
 
-// @host localhost:8080
 // @BasePath /api/
 // @schemes http
 func main() {
