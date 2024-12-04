@@ -62,3 +62,7 @@ func (s *Service) Route(ctx context.Context, loc *dto.LocationDto) (*dto.Locatio
 
 	return route.ToLocationListResponseDto(), nil
 }
+
+func (s *Service) Delete(ctx context.Context, idList []uint) error {
+	return s.repo.Delete(ctx, idList)
+}

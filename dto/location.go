@@ -28,6 +28,10 @@ type LocationListResponseDto struct {
 	Items []LocationResponseDto
 }
 
+type LocationIdDto struct {
+	IdList []uint `json:"idList"`
+}
+
 func NewLocationDto(data []byte, validate bool) (*LocationDto, error) {
 	loc := &LocationDto{}
 

@@ -4,18 +4,29 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/AvraamMavridis/randomcolor"
+	"github.com/guneyin/locator/config"
 	database "github.com/guneyin/locator/db"
 	"github.com/guneyin/locator/dto"
 	"github.com/guneyin/locator/repository/location"
 	"github.com/guneyin/locator/util"
+	"github.com/ilyakaznacheev/cleanenv"
 	. "github.com/smartystreets/goconvey/convey"
 	"gorm.io/gorm"
+	"log/slog"
 	"os"
 	"testing"
 )
 
 func newDB(withTestData bool) *gorm.DB {
-	db, err := database.NewTestDB()
+	var cfg config.Config
+
+	err := cleanenv.ReadConfig("../../.env", &cfg)
+	if err != nil {
+		_ = cleanenv.ReadEnv(&cfg)
+		slog.Info(err.Error())
+	}
+
+	db, err := database.NewDB(&cfg)
 	if err != nil {
 		panic(err)
 	}

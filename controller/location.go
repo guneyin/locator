@@ -31,6 +31,7 @@ func (l Location) SetRoutes(r fiber.Router) IController {
 	g.Get("/:id", l.Detail)
 	g.Patch(":id", l.Edit)
 	g.Post("/route", l.Route)
+	g.Delete("/", l.Delete)
 
 	return l
 }
@@ -155,4 +156,30 @@ func (l Location) Route(c *fiber.Ctx) error {
 	}
 
 	return mw.OK(c, "route listed successfully", route)
+}
+
+// Delete
+// @Summary Delete locations.
+// @Description Delete location data in DB.
+// @Tags location delete
+// @Accept json
+// @Produce json
+// @Param location body dto.LocationIdDto true "Delete locations"
+// @Success 200 {object} mw.ResponseHTTP{}
+// @Failure 404 {object} mw.ResponseHTTP{}
+// @Failure 500 {object} mw.ResponseHTTP{}
+// @Router /location [delete]
+func (l Location) Delete(c *fiber.Ctx) error {
+	idList := dto.LocationIdDto{}
+
+	if err := c.BodyParser(&idList); err != nil {
+		return err
+	}
+
+	err := l.svc.Delete(c.Context(), idList.IdList)
+	if err != nil {
+		return err
+	}
+
+	return mw.OK(c, "locations deleted successfully", nil)
 }

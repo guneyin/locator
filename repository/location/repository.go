@@ -62,3 +62,7 @@ func (r *Repository) Edit(ctx context.Context, id uint, loc *Location) (*Locatio
 
 	return r.Detail(ctx, id)
 }
+
+func (r *Repository) Delete(ctx context.Context, idList []uint) error {
+	return r.db.WithContext(ctx).Delete(&Location{}, idList).Error
+}
